@@ -1,14 +1,24 @@
 {% extends 'base.html '%}
 {% block title %} Index {% endblock %}
 {% block body %}
-<div class="jumbotron">  
+<div class="jumbotron text-center">  
       <div class="row">
             <div class="col-md-12 col-xs-12 col-sm-0 col-lg-12 ">
             <div class="col-md-1 col-xs-2 col-sm-0 col-lg-2 "></div>
             <div class="col-md-10 col-xs-8 col-sm-8=12 col-lg-8">
 
                     <div class="jumbotron"><class=text-primary>
+
                            <h1>Registration Form</h1>
+                             <div class="row ">
+        {% if messages %}
+            <div class="jumbotron text-primary alert alert-danger text-center">
+                {% for message in messages %}
+                    <h4>{{ message }}</h4>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
                                   <form method="post" class="form-horizontal">
             {% csrf_token %}
             <div class="form-group">

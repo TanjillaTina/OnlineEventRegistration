@@ -1,11 +1,16 @@
-from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from myapp import forms
 from myapp.forms import SaveRegister
 from myapp.models import RegistrationInfo
 from django.contrib.auth import authenticate, login
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 import uuid
-from django.core import validators
+from django.contrib import messages
+import django
+from django.conf import settings
+from django.core.mail import send_mail
+
 def index(request):
 	form=SaveRegister()
 	po=RegistrationInfo()
@@ -16,6 +21,7 @@ def index(request):
 
 		if form.is_valid():
 			form.save(commit=False)
+			
 			fname=form.cleaned_data['first_name']
 			lname=form.cleaned_data['last_name']
 			faname=form.cleaned_data['father_name']
@@ -25,19 +31,37 @@ def index(request):
 			addrs=form.cleaned_data['address']
 			mailid=form.cleaned_data['email']
 			edu=form.cleaned_data['education']
-			unik=UIDGenerate()
+			unik=uniquess_key()
 			po=RegistrationInfo(first_name=fname,last_name=lname,father_name=faname,date_of_birth=birth,roll_num=roll,email=mailid,phone=phhn,address=addrs,education=edu,uid=unik)
 			po.save()
+			messages.success(request, 'Form submission successful!! Plz check email for id ')
+			email_body = 'Your Registration ID Number is ' + unik
+			#email = EmailMessage('Congratulations!!', email_body, to=[mailid, ])
+			#email.send()
+			send_mail('Confirmation Mail', email_body, settings.EMAIL_HOST_USER,
+				[mailid], fail_silently=False)
 
+
+
+
+			return HttpResponseRedirect(reverse('index'))
+			#return HttpResponseRedirect(reverse('index'))
+
+
+
+
+
+
+
+			#print("Congrast")
 
 		else:
-		return HttpResponseRedirect(reverse('index'))
-		
+			messages.error(request, form.errors)
+			return HttpResponseRedirect(reverse('index'))
 	return render(request,'regiform.html',{'form':form,})
 
-def UIDGenerate():
+def uniquess_key():
 	return uuid.uuid4().hex[:15].upper()
-
 
 
 
